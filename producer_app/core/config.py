@@ -6,5 +6,7 @@ RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
 
 # Exchange for order events
 EXCHANGE_NAME = os.getenv("EXCHANGE_NAME", "orders.events")
-EXCHANGE_TYPE = "topic"  # route by routing key (e.g. order status)
+EXCHANGE_TYPE = "topic"  # broadcast to all bound queues
 
+BINDING_KEY = os.getenv("BINDING_KEY", "new")
+QUEUE_NAME = os.getenv("QUEUE_NAME", "order-service.new")

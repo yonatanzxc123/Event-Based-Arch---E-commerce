@@ -2,7 +2,7 @@ import json
 import pika
 from pika import BlockingConnection, URLParameters, BasicProperties
 
-from producer_app.core.config import RABBITMQ_URL, EXCHANGE_NAME, EXCHANGE_TYPE
+from producer_app.core.config import RABBITMQ_URL, EXCHANGE_NAME, EXCHANGE_TYPE, QUEUE_NAME
 from producer_app.models.order import Order
 
 
@@ -22,10 +22,18 @@ def publish_order(order: Order) -> None:
         durable=True,
     )
 
+    channel.queue_declare(queue=QUEUE_NAME, durable=True)
+    routing_key = order.status
+    channel.queue_bind(
+        queue=QUEUE_NAME,
+        exchange=EXCHANGE_NAME,
+        routing_key=routing_key
+    )
+
+
+
     body_bytes = order.model_dump_json().encode("utf-8")
 
-    # Use the order status as the routing key (e.g. "new")
-    routing_key = order.status
 
     channel.basic_publish(
         exchange=EXCHANGE_NAME,

@@ -21,25 +21,29 @@ docker compose -f consumer.yml up
 
 *)Exchange type and why I used it : 
 
-the exchange type I chose is - fanout
+the exchange type I chose is - topic
 
-why ?  the fanout exchange broadcasts every message to all bound queues without filterling (and we were asked to make sure that "The event must be broadcast to all consumers")
-this method ensures that every consumer recevies every order event and it models broadcast-style event propagation exactly like the event-driven architecture pattern that we were taught.
-
-
-*)Rergarding the binding key - there is none, becuase fanout exahcnge ignores routing keys entirely.
-therefore, the consumer binds its queue to the exchange without a binding key
+why ?  the topic exchange provides a flexible and scalable routing mechanism.
+While in the task at hand we are requried to broadcast every message to our current consumers, a topic exchange allows us to use specific routing keys (such as order status, "new").
+And this ensures every consumer receives all relevant order events as requried by the task, but also provides flexibility for future microservices to only subscribe to some events (e.g., "shipped" status and such). 
+This models a scalable event-driven architecture pattern. (like we were tought in class)
 
 
+*)Rergarding the binding key -
 
-*)The service that delclated the exchange  - Producer 
-why ? The producer is the source of all events and it guarntees that the exchange exists before any message is even published!
-this makes sure that no meesage will fail due to some missing exchange.
+I usedd the order status (e.g., "new") as the binding key.
+ This key is used to bind the consumer's queue to the topic exchange, which ensures all messages with that specific status are delivered to the queue.
 
-but the Queues are declared by - Consumer
 
-consumers will define his own queses becuase consumers own ther message storage,
-each one of them can have its own queue name and consumers can decide how to bind to the exchange 
+
+*)The service that delclated the exchange  - Both the Producer and the Consumer declare the exchange and the queue
+
+The producer ensures the exchange exists before any message is published, whcih guarantees no message failure.
+And the consumer defines its own queue and binding logic.
+I chose this approach because it ensures that everyone gets the messages as the declaration operations are idempotent!.
+This means running the declaration from both sides is safe and cannot hurt the system configuration.
+Its simply ensures the infrastructure exists regardless of which service starts first, making the system I built highly resilient and robust.
+
 
 
 

@@ -24,13 +24,16 @@ def publish_order(order: Order) -> None:
 
     body_bytes = order.model_dump_json().encode("utf-8")
 
+    # Use the order status as the routing key (e.g. "new")
+    routing_key = order.status
+
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
-        routing_key="",  # ignored for fanout
+        routing_key=routing_key,
         body=body_bytes,
         properties=BasicProperties(
             content_type="application/json",
-            delivery_mode=2,  # 2 = persistent message
+            delivery_mode=2,  # persistent
             headers={"event_type": "order.created"},
         ),
     )

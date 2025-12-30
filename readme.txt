@@ -1,5 +1,4 @@
-Name : Yehonatan Segev
-ID : 322335878
+
 
 *)Producer URL : http://localhost:8000/create-order  - Creates a new order (HTTP POST request) and publish it to RabbitMQ
 also the user needs a body with order ID and item count
